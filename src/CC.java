@@ -28,7 +28,7 @@ public class CC
 		//TODO
 
 		String execution = round_robin(db, transactions);
-		//System.out.println(execution);
+
 		return null;
 	}
 
@@ -66,29 +66,6 @@ public class CC
 			trans_ids.put(t + "" + (i+1), 0);
 		}
 
-		//using table[j][i]
-//		for (int i = 0; i <	table[0].length; i++) {
-//			String t_id;
-//			for (int j = 0; j < table.length; j++) {
-//				t_id = "T" + (j+1);
-//				int index = trans_ids.get(t_id);
-//				String temp = table[j][index];
-//				if (temp.contains("W")) {
-//					int id = Integer.parseInt(temp.substring(temp.indexOf('(')+1, temp.indexOf(',')));
-//					if (locks.get(id) == null || locks.get(id).equals("0")) {
-//						locks.put(id, t_id);
-//						trans_ids.put(t_id, trans_ids.get(t_id)+1);
-//						result += t_id + ":" +temp + ";";
-//					}
-//				} else if (temp.contains("R")) {
-//					int id = Integer.parseInt(temp.substring(temp.indexOf('(')+1, temp.indexOf(')')));
-//					if (locks.get(id) == null || locks.get(id).equals(t_id)) {
-//						trans_ids.put(t_id, trans_ids.get(t_id)+1);
-//						result += t_id + ":" +temp + ";";
-//					}
-//				}
-//			}
-//		}
 
 		int num_commits = 0;
 		while (num_commits < table.length) {
@@ -101,6 +78,7 @@ public class CC
 				if (result.contains(quick_check)) {
 					continue;
 				}
+
 				if (temp.contains("W")) {
 					int id = Integer.parseInt(temp.substring(temp.indexOf('(')+1, temp.indexOf(',')));
 					if (locks.get(id) == null || locks.get(id).equals("0")) {
@@ -128,38 +106,9 @@ public class CC
 			}
 		}
 		System.out.println(result);
-		return null;
+		return result;
 	}
 
-	//TABLE IMPLEMENTATION...
-//	int max_actions = 0;
-//		for (int i = 0; i < transactions.size(); i++) {
-//	String[] splits = transactions.get(i).split(";");
-//	if (splits.length > max_actions) {
-//		max_actions = splits.length;
-//	}
-//}
-//	//rows are the T1 (T2, T3, etc), and columns are the actions for each
-//	// i x j
-//	String[][] table = new String[transactions.size()][max_actions];
-//
-//	int row = 0;
-//	int column;
-//	String empty = "0";
-//		for (String s:transactions ) {
-//	String[] splits = s.split(";");
-//	for (column = 0; column < max_actions; column++) {
-//		if (column < splits.length) {
-//			table[row][column] = splits[column];
-//		}
-//	}
-//	row++;
-//}
-//
-//	String t = "T";
-//	//using table[j][i]
-//	int i = 0;
-//	int j = 0;
 
 	//this will generate a system log string to be added to the entire log
 	public static String system_log(String log) {
