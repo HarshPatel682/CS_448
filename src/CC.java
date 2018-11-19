@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 
 public class CC
@@ -27,6 +30,31 @@ public class CC
 	public static int[] executeSchedule(int[] db, List<String> transactions)
 	{
 		//TODO
+
+		String execution = round_robin(transactions);
+		//System.out.println(execution);
+		return null;
+	}
+
+	public static String round_robin(List<String> transactions) {
+		String result = "";
+
+		Hashtable<String, List<String>> transactions_t = new Hashtable<>();
+		String curr = "T";
+		int i = 1;
+		for (String s: transactions ) {
+			String[] splits = s.split(";");
+			String temp = curr + i;
+			if (!transactions_t.containsKey(temp)) {
+				transactions_t.put(temp, new ArrayList<String>());
+			}
+			for (int j = 0; j < splits.length; j++) {
+				transactions_t.get(temp).add(splits[j]);
+			}
+			i++;
+		}
+
+		
 		return null;
 	}
 
