@@ -23,13 +23,24 @@ public class CC
 	 * @return  the {@code db} state after excuting the transactions.
 	 */
 
+	static int[] database;
+	static int timestamp;
+	static List<String> complete_system_log;
 	public static int[] executeSchedule(int[] db, List<String> transactions)
 	{
 		//TODO
+        database = db.clone();
+        timestamp = 0;
+        complete_system_log = new ArrayList<>();
 
 		String execution = round_robin(db, transactions);
+		system_log(execution);
 
-		return null;
+        System.out.println("Log:");
+        for (String s: complete_system_log) {
+            System.out.println(s);
+        }
+		return database;
 	}
 
 	public static String round_robin(int[] db, List<String> transactions) {
@@ -105,13 +116,54 @@ public class CC
 				}
 			}
 		}
-		System.out.println(result);
+		//System.out.println(result);
 		return result;
 	}
 
 
 	//this will generate a system log string to be added to the entire log
-	public static String system_log(String log) {
-		return null;
+	public static void system_log(String log) {
+        String[] splits = log.split(";");
+        HashMap<String, Integer> previous_timestamp = new HashMap<>();
+
+        for (String s: splits ) {
+            String Tid = s.substring(0, s.indexOf(":"));
+
+            if (!previous_timestamp.containsKey(Tid)) {
+                previous_timestamp.put(Tid, -1);
+            }
+
+            String command = s.substring(s.indexOf(":")+1, s.indexOf(":")+2);
+
+            String to_add = command + ":"+ timestamp + "," + Tid;
+            if (command.equals("W")) {
+                int recordID = Integer.parseInt(s.substring(s.indexOf("(")+1, s.indexOf(",")));
+                int new_value = Integer.parseInt(s.substring(s.indexOf(",")+1, s.indexOf(")")));
+
+                int old_value = database[recordID];
+
+                 to_add += ","+ recordID + "," + old_value + "," + new_value + "," + previous_timestamp.get(Tid);
+                complete_system_log.add(to_add);
+                previous_timestamp.put(Tid, timestamp);
+
+                database[recordID] = new_value;
+
+            } else if (command.equals("R")) {
+
+                int recordID = Integer.parseInt(s.substring(s.indexOf("(")+1, s.indexOf(")")));
+                int value_read = database[recordID];
+
+                to_add += ","+ recordID + "," + value_read + "," + previous_timestamp.get(Tid);
+                complete_system_log.add(to_add);
+
+                previous_timestamp.put(Tid, timestamp);
+
+            } else if (command.equals("C")) {
+                to_add += "," + previous_timestamp.get(Tid);
+                complete_system_log.add(to_add);
+                previous_timestamp.put(Tid, timestamp);
+            }
+            timestamp++;
+        }
 	}
 }
