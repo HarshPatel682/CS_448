@@ -23,18 +23,24 @@ public class CC
 	 * @return  the {@code db} state after excuting the transactions.
 	 */
 
-	static int[] database;
-	static int timestamp;
-	static List<String> complete_system_log;
-	public static int[] executeSchedule(int[] db, List<String> transactions)
+	private static int[] database;
+    private static int timestamp;
+    private static List<String> complete_system_log;
+    private static HashMap<String, Integer> previous_timestamp;
+
+    public static int[] executeSchedule(int[] db, List<String> transactions)
 	{
 		//TODO
         database = db.clone();
         timestamp = 0;
         complete_system_log = new ArrayList<>();
+        previous_timestamp = new HashMap<>();
 
 		String execution = round_robin(db, transactions);
-		system_log(execution);
+		String[] splits = execution.split(";");
+		for (String s: splits) {
+			system_log(s);
+		}
 
         System.out.println("Log:");
         for (String s: complete_system_log) {
@@ -123,10 +129,7 @@ public class CC
 
 	//this will generate a system log string to be added to the entire log
 	public static void system_log(String log) {
-        String[] splits = log.split(";");
-        HashMap<String, Integer> previous_timestamp = new HashMap<>();
-
-        for (String s: splits ) {
+        String s = log;
             String Tid = s.substring(0, s.indexOf(":"));
 
             if (!previous_timestamp.containsKey(Tid)) {
@@ -164,6 +167,6 @@ public class CC
                 previous_timestamp.put(Tid, timestamp);
             }
             timestamp++;
-        }
+
 	}
 }
