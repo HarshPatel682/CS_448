@@ -6,4 +6,4 @@ The way I have it setup is that I create the round robin schedule with all of th
 Then I split up the string and run each part of the transaction according to the schedule. Then I run the system log to document
 each operation. I was thinking about checking for cycles while I was making the round robin schedule. Then when I would hit
 an abort, I would go though the system log to revert the changes that that specific transaction has made.
-Again, I was very close to getting the cycle detection.  
+Again, I was very close to getting the cycle detection.

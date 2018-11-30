@@ -1,6 +1,6 @@
 import java.util.*;
 
-public class CC
+public class CC_Patel682
 {
 
 	/**
