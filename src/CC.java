@@ -28,6 +28,10 @@ public class CC
     private static List<String> complete_system_log;
     private static HashMap<String, Integer> previous_timestamp;
 
+    private static int V;
+    private static List<List<Integer>> adj;
+    private static boolean thereIsCycle;
+
     public static int[] executeSchedule(int[] db, List<String> transactions)
 	{
 		//TODO
@@ -35,6 +39,8 @@ public class CC
         timestamp = 0;
         complete_system_log = new ArrayList<>();
         previous_timestamp = new HashMap<>();
+        adj = new ArrayList<>();
+        thereIsCycle = false;
 
 		String execution = round_robin(db, transactions);
 		String[] splits = execution.split(";");
@@ -79,10 +85,15 @@ public class CC
 
 		String t = "T";
 		HashMap<String, Integer> trans_ids = new HashMap<>();
+		V = 0;
 		for (int i = 0; i < table.length; i++) {
 			trans_ids.put(t + "" + (i+1), 0);
+			V++;
 		}
 
+        for (int i =0; i < V; i++ ) {
+            adj.add(new LinkedList<>());
+        }
 
 		int num_commits = 0;
 		while (num_commits < table.length) {
@@ -102,7 +113,13 @@ public class CC
 						locks.put(id, t_id);
 						trans_ids.put(t_id, trans_ids.get(t_id)+1);
 						result += quick_check;
-					}
+					} else {
+					    addEdge(j+1, id);
+					    thereIsCycle = isCyclic();
+					    if (thereIsCycle) {
+					        result += "A:" + t_id + ";";
+					    }
+                    }
 				} else if (temp.contains("R")) {
 					int id = Integer.parseInt(temp.substring(temp.indexOf('(')+1, temp.indexOf(')')));
 					if (locks.get(id) == null || locks.get(id).equals(t_id)) {
@@ -165,8 +182,53 @@ public class CC
                 to_add += "," + previous_timestamp.get(Tid);
                 complete_system_log.add(to_add);
                 previous_timestamp.put(Tid, timestamp);
+            } else if (command.equals("A")) {
+                to_add += "," + previous_timestamp.get(Tid);
+                complete_system_log.add(to_add);
+                previous_timestamp.put(Tid, timestamp);
             }
             timestamp++;
-
 	}
+
+    private static void addEdge(int source, int dest) {
+        adj.get(source).add(dest);
+    }
+
+    private static boolean isCyclicUtil(int i, boolean[] visited, boolean[] recStack) {
+
+        if (recStack[i]) {
+            return true;
+        }
+
+        if (visited[i]) {
+            return false;
+        }
+
+        visited[i] = true;
+        recStack[i] = true;
+        List<Integer> children = adj.get(i);
+
+        for (Integer c: children) {
+            if (isCyclicUtil(c, visited, recStack)) {
+                return true;
+            }
+        }
+
+        recStack[i] = false;
+
+        return false;
+    }
+
+    private static boolean isCyclic() {
+        boolean[] visited = new boolean[V];
+        boolean[] recStack = new boolean[V];
+
+        for (int i = 0; i < V; i++) {
+            if (isCyclicUtil(i, visited, recStack)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
